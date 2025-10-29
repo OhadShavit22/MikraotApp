@@ -7,7 +7,6 @@ import { ThemedView } from '@/components/themed-view';
 import { Colors } from '@/constants/theme';
 import Player from '@/models/player';
 import { Rank } from '@/models/rank';
-import { useFonts } from 'expo-font';
 import { Link } from 'expo-router';
 import { useState } from 'react';
 
@@ -48,10 +47,6 @@ import { useState } from 'react';
       rank: Rank.SAMAL,
       score: 32563
     })
-
-    const [fontsLoaded, fontError] = useFonts({
-    'GevertLevin-Regular': require('./../assets/fonts/GevertLevin-Regular.ttf'),
-  });
 
     return (
       <ThemedView style={styles.container} lightColor='#f5f5f5'>
