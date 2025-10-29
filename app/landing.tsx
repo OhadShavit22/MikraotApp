@@ -21,22 +21,22 @@ import { useState } from 'react';
     {
       label: 'סיכומים',
       icon: require('@/assets/images/LearnIcon.png'),
-      href: '/(tabs)', // Placeholder
+      href: 'landing', // Placeholder
     },
     {
       label: 'דרגות',
       icon: require('@/assets/images/RankIcon.png'),
-      href: '/(tabs)', // Placeholder
+      href: 'landing', // Placeholder
     },
     {
       label: 'מי אנחנו?',
       icon: require('@/assets/images/PeopleIcon.png'),
-      href: '/(tabs)', // Placeholder
+      href: 'landing', // Placeholder
     },
     {
       label: 'העלאת שאלות!',
       icon: require('@/assets/images/UploadIcon.png'),
-      href: '/(tabs)', // Placeholder
+      href: 'landing', // Placeholder
     },
   ];
   export default function LandingPage() {
@@ -49,7 +49,7 @@ import { useState } from 'react';
     })
 
     const [fontsLoaded, fontError] = useFonts({
-    'GevertLevin-Regular': require('./../../assets/fonts/GevertLevin-Regular.ttf'),
+    'GevertLevin-Regular': require('./../assets/fonts/GevertLevin-Regular.ttf'),
   });
 
     return (
