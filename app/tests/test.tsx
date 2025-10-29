@@ -5,8 +5,9 @@ import AmericanQuestionAnswer from "@/models/american-question-answer";
 import TestSettings from "@/models/test-settings";
 import { useTestSettingsStore } from "@/store/test-settings-store";
 import { router } from "expo-router";
+import { StatusBar } from 'expo-status-bar';
 import * as React from 'react';
-import { Dimensions, ScrollView, StatusBar, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Dimensions, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { Button } from "react-native-paper";
 
 const { width } = Dimensions.get('window');
@@ -63,12 +64,12 @@ export default function TestPage() {
         if (router.canGoBack()) {
             router.back();
         } else {
-            router.replace('/(tabs)/landing');
+            router.replace('/landing');
         }
     };
 
     const handleGoToLanding = () => {
-        router.replace('/(tabs)/landing');
+        router.replace('/landing');
     };
 
     const handleAnswerPress = (answer: AmericanQuestionAnswer) => {
@@ -115,7 +116,7 @@ export default function TestPage() {
 
         return (
             <ThemedView style={styles.container}>
-                <StatusBar barStyle="dark-content" />
+                <StatusBar style="dark" />
                 <ScrollView contentContainerStyle={styles.scrollContainer}>
                     <View style={styles.summaryHeader}>
                         <ThemedText style={styles.summaryTitle}>תוצאות המבחן</ThemedText>

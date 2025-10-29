@@ -5,8 +5,9 @@ import TestSettings from "@/models/test-settings";
 import { useTestSettingsStore } from "@/store/test-settings-store";
 import { useFonts } from "expo-font";
 import { router } from "expo-router";
+import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import { Dimensions, ScrollView, StatusBar, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Dimensions, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { Button } from 'react-native-paper';
 import Toast, { ErrorToast } from 'react-native-toast-message';
 const { width } = Dimensions.get('window');
@@ -86,13 +87,13 @@ export default function TestSettingsPage() {
         if (router.canGoBack()) {
             router.back();
         } else {
-            router.replace('/(tabs)/landing');
+            router.replace('/landing');
         }
     };
 
     return (
         <ThemedView style={styles.container} lightColor='#f5f5f5'>
-            <StatusBar barStyle="dark-content" />
+            <StatusBar style="dark" />
             <ScrollView contentContainerStyle={styles.scrollContainer}>
                 <TouchableOpacity onPress={handleSafeBack} style={styles.backButton}>
                     <ThemedText style={styles.backButtonText}>→ חזור</ThemedText>

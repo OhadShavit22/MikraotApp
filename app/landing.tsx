@@ -1,4 +1,5 @@
-  import { Dimensions, Image, ScrollView, StatusBar, StyleSheet, TouchableOpacity, View } from 'react-native';
+  import { StatusBar } from 'expo-status-bar';
+import { Dimensions, Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 
   import { ThemedText } from '@/components/themed-text';
@@ -54,7 +55,7 @@ import { useState } from 'react';
 
     return (
       <ThemedView style={styles.container} lightColor='#f5f5f5'>
-        <StatusBar barStyle="dark-content" />
+        <StatusBar style="dark" />
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.header}>
             <ThemedText style={styles.title} type="title">מקרעות!</ThemedText>
