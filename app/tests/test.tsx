@@ -2,6 +2,9 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import AmericanQuestion from "@/models/american-question";
 import AmericanQuestionAnswer from "@/models/american-question-answer";
+import OrderingQuestion from "@/models/ordering-question";
+import OrderingQuestionAnswer from "@/models/ordering-question-answer";
+import OrderingQuestionStatement from "@/models/ordering-question-statement";
 import TestSettings from "@/models/test-settings";
 import { useTestSettingsStore } from "@/store/test-settings-store";
 import { router } from "expo-router";
@@ -42,14 +45,23 @@ const getTestQuestions = (testSettings: TestSettings) => {
                 new AmericanQuestionAnswer("עמק המוות", "עמק המוות הוא מקום נמוך מאוד, אך לא כמו ים המלח.", false)
             ]
         ),
+        new OrderingQuestion(
+            "סדר את האירועים הבאים, מהמוקדם למאוחר",
+            [
+                new OrderingQuestionStatement("מלחמת ששת הימים", "מלחמת ששת הימים פרצה ב1967", 2),
+                new OrderingQuestionStatement("מבצע קדש", "מבצע קדש פרץ ב1956", 1),
+                new OrderingQuestionStatement("מלחמת העצמאות", "מלחמת העצמאות פרצה ב1948", 0),
+                new OrderingQuestionStatement("מלחמת יום כיפור", "מלחמת יום כיפור פרצה ב1973", 3)
+            ]
+        )
     ]
 }
 
 export default function TestPage() {
     const testSettings = useTestSettingsStore((state) => state.testSettings);
-    const [questions, setQuestions] = React.useState<AmericanQuestion[]>([]);
+    const [questions, setQuestions] = React.useState<(AmericanQuestion | OrderingQuestion)[]>([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = React.useState(0);
-    const [userAnswers, setUserAnswers] = React.useState<(AmericanQuestionAnswer | null)[]>([]);
+    const [userAnswers, setUserAnswers] = React.useState<(AmericanQuestionAnswer | OrderingQuestionAnswer | null)[]>([]);
     const [isAnswered, setIsAnswered] = React.useState(false);
     const [isTestFinished, setIsTestFinished] = React.useState(false);
     const [showAnswers, setShowAnswers] = React.useState(false);
@@ -91,18 +103,34 @@ export default function TestPage() {
         }
     };
 
+    const isAnswerCorrect = (answer: AmericanQuestionAnswer | OrderingQuestionAnswer | null) => {
+        if (answer instanceof AmericanQuestionAnswer) {
+            return answer.isCorrect;
+        } 
+        if (answer instanceof OrderingQuestionAnswer) {
+            for (let index = 0; index < answer.order.length; index++) {
+                if (answer.order[index].correctIndex !== index)
+                    return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
     const getAnswerStyle = (answer: AmericanQuestionAnswer) => {
         const selectedAnswer = userAnswers[currentQuestionIndex];
-        if (!isAnswered) {
-            return answer.answer === selectedAnswer?.answer ? styles.selectedAnswer : styles.answerButton;
+        if (selectedAnswer instanceof AmericanQuestionAnswer) {
+            if (!isAnswered) {
+                return answer.answer === selectedAnswer?.answer ? styles.selectedAnswer : styles.answerButton;
+            }
+            if (answer.isCorrect) {
+                return styles.correctAnswer;
+            }
+            if (answer.answer === selectedAnswer?.answer) {
+                return styles.incorrectAnswer;
+            }
+            return styles.answerButton;
         }
-        if (answer.isCorrect) {
-            return styles.correctAnswer;
-        }
-        if (answer.answer === selectedAnswer?.answer) {
-            return styles.incorrectAnswer;
-        }
-        return styles.answerButton;
     };
 
     if (questions.length === 0) {
@@ -110,7 +138,7 @@ export default function TestPage() {
     }
 
     if (isTestFinished) {
-        const correctAnswersCount = userAnswers.filter(answer => answer?.isCorrect).length;
+        const correctAnswersCount = userAnswers.filter(answer => isAnswerCorrect(answer)).length;
         const totalQuestions = questions.length;
         const percentage = Math.round((correctAnswersCount / totalQuestions) * 100);
 
@@ -137,8 +165,9 @@ export default function TestPage() {
                             {questions.map((question, index) => (
                                 <View key={index} style={styles.summaryQuestionContainer}>
                                     <ThemedText style={styles.questionText}>{ `${index + 1}. ${question.question}`}</ThemedText>
-                                    {question.answers.map(answer => {
-                                        const isSelected = userAnswers[index]?.answer === answer.answer;
+                                    {question instanceof AmericanQuestion && question.answers.map(answer => {
+                                        const userAnswer = userAnswers[index] as AmericanQuestionAnswer;
+                                        const isSelected = userAnswer.answer === answer.answer;
                                         const style = answer.isCorrect ? styles.correctAnswer : (isSelected ? styles.incorrectAnswer : styles.answerButton);
                                         return (
                                             <View key={answer.answer} style={[styles.answerButton, style, styles.summaryAnswer]}>
@@ -168,7 +197,7 @@ export default function TestPage() {
 
     return (
         <ThemedView style={styles.container}>
-            <StatusBar barStyle="dark-content" />
+            <StatusBar style="dark" />
             <ScrollView contentContainerStyle={styles.scrollContainer}>
                 <TouchableOpacity onPress={handleSafeBack} style={styles.backButton}>
                     <ThemedText style={styles.backButtonText}>→ חזור</ThemedText>
@@ -179,7 +208,7 @@ export default function TestPage() {
                 </View>
 
                 <View style={styles.answersContainer}>
-                    {currentQuestion.answers.map((answer) => (
+                    {currentQuestion instanceof AmericanQuestion && currentQuestion.answers.map((answer) => (
                         <TouchableOpacity
                             key={answer.answer}
                             style={[styles.answerButton, getAnswerStyle(answer)]}
