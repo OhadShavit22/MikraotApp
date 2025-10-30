@@ -54,7 +54,7 @@ import { useState } from 'react';
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.header}>
             <ThemedText style={styles.title} type="title">מקרעות!</ThemedText>
-            <ThemedText style={styles.subtitle} type='subtitle'>בדרך לבה"ד עוברים את המבחן...</ThemedText>
+            <ThemedText style={styles.subtitle} type='subtitle'>{"בדרך לבה\"ד עוברים את המבחן..."}</ThemedText>
             <ThemedText style={styles.playerDetails} type='subtitle'>{playerDetails?.displayName} - {playerDetails?.rank} - {playerDetails?.score}</ThemedText>
           </View>
 

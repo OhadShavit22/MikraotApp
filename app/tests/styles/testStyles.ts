@@ -1,0 +1,54 @@
+import { Dimensions, StyleSheet } from "react-native";
+
+const { width } = Dimensions.get('window');
+
+export const styles = StyleSheet.create({
+    container: { flex: 1, backgroundColor: '#f5f5f5' },
+    scrollContainer: { flexGrow: 1, padding: width * 0.05, justifyContent: 'flex-start' },
+    backButton: { position: 'absolute', top: '6%', right: '5%', zIndex: 1, paddingTop: 10 },
+    backButtonText: { fontSize: 18, color: '#006837' },
+    header: { alignItems: 'center', marginVertical: '10%', paddingTop: '10%' },
+    questionCounter: { fontSize: 20, color: 'gray', marginBottom: 10 },
+    questionText: { fontSize: 28, fontWeight: 'bold', textAlign: 'center', color: '#333', lineHeight: 32 },
+    answersContainer: { marginVertical: 20, flex: 1 },
+    answerButton: {
+        backgroundColor: 'white',
+        padding: 20,
+        marginVertical: 8,
+        borderRadius: 15,
+        borderWidth: 1,
+        borderColor: '#ddd',
+        alignItems: 'center',
+    },
+    selectedAnswer: { borderColor: '#006837', borderWidth: 2 },
+    correctAnswer: { backgroundColor: '#d4edda', borderColor: '#c3e6cb' },
+    incorrectAnswer: { backgroundColor: '#f8d7da', borderColor: '#f5c6cb' },
+    disabledAnswer: { backgroundColor: '#f0f0f0' },
+    answerText: { fontSize: 18, color: '#333', fontWeight: 'bold', textAlign: 'center' },
+    detailText: { fontSize: 12, color: '#555', marginTop: 8, textAlign: 'center', writingDirection: 'rtl' },
+    nextButtonContainer: { alignItems: 'center', marginTop: 'auto', paddingTop: 20 },
+    nextButton: { backgroundColor: '#006837', paddingVertical: 8, paddingHorizontal: 20, borderRadius: 20, width: '70%' },
+    nextButtonText: { color: 'white', fontSize: 20, fontWeight: 'bold' },
+    summaryHeader: { alignItems: 'center', marginVertical: '10%', paddingTop: '10%' },
+    summaryTitle: { fontSize: 32, fontWeight: 'bold', color: '#333', lineHeight: 35 },
+    scoreText: { fontSize: 22, color: 'gray', marginVertical: 10, lineHeight: 22 },
+    percentageText: { fontSize: 26, fontWeight: 'bold', color: '#006837', lineHeight: 28 },
+    summaryQuestionContainer: { marginVertical: 20 },
+    summaryAnswer: { padding: 15, marginVertical: 5 },
+    toggleAnswersButton: {
+        marginVertical: 20,
+        padding: 15,
+        borderRadius: 10,
+        backgroundColor: '#e7e7e7',
+        alignItems: 'center',
+    },
+    toggleAnswersButtonText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#333',
+    },
+    orderingMenuItem: {
+        backgroundColor: 'white',
+        width: width * 0.8,
+    },
+});
