@@ -59,7 +59,7 @@ const getTestQuestions = (testSettings: TestSettings) => {
     ]
 }
 
-const OrderingQuestionComponent = ({ question, onAnswer, isAnswered }: { question: OrderingQuestion, onAnswer: (answer: OrderingQuestionAnswer) => void, isAnswered: boolean }) => {
+const OrderingQuestionComponent = ({ question, onAnswer, isAnswered, hasBeenAnswered }: { question: OrderingQuestion, onAnswer: (answer: OrderingQuestionAnswer) => void, isAnswered: boolean, hasBeenAnswered: boolean }) => {
     const [statements, setStatements] = React.useState<OrderingQuestionStatement[]>([]);
 
     React.useEffect(() => {
@@ -93,7 +93,7 @@ const OrderingQuestionComponent = ({ question, onAnswer, isAnswered }: { questio
                     </ScaleDecorator>
                 )}
             />
-            {!isAnswered && (
+            {!isAnswered && !hasBeenAnswered && (
                 <View style={styles.nextButtonContainer}>
                     <Button style={styles.nextButton} onPress={handleLockAnswer}>
                         <ThemedText style={styles.nextButtonText}>נעל תשובה</ThemedText>
@@ -308,6 +308,7 @@ export default function TestPage() {
                         key={currentQuestion.question}
                         onAnswer={handleAnswerPress}
                         isAnswered={false}
+                        hasBeenAnswered={!!selectedAnswer}
                     />
                 )}
                 {currentQuestion instanceof OrderingQuestion && isAnswered && selectedAnswer instanceof OrderingQuestionAnswer && (
