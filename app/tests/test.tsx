@@ -11,7 +11,9 @@ import { router } from "expo-router";
 import { StatusBar } from 'expo-status-bar';
 import * as React from 'react';
 import { Dimensions, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
-import { Button, Menu } from "react-native-paper";
+import DraggableFlatList, { ScaleDecorator } from "react-native-draggable-flatlist";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { Button } from "react-native-paper";
 
 const { width } = Dimensions.get('window');
 
@@ -30,9 +32,9 @@ const getTestQuestions = (testSettings: TestSettings) => {
         new AmericanQuestion(
             "באיזו שנה הוכרזה מדינת ישראל?",
             [
-                new AmericanQuestionAnswer("1947", "בשנה זו התקבלה תוכנית החלוקה באו\"ם.", false), // Note: This " is correctly escaped for the string literal
+                new AmericanQuestionAnswer("1947", "בשנה זו התקבלה תוכנית החלוקה באו\"ם.", false),
                 new AmericanQuestionAnswer("1956", "בשנה זו היה מבצע קדש.", false),
-                new AmericanQuestionAnswer("1948", "מדינת ישראל הוכרזה בה' באייר תש\"ח, 14 במאי 1948.", true), // Note: This " is correctly escaped for the string literal
+                new AmericanQuestionAnswer("1948", "מדינת ישראל הוכרזה בה' באייר תש\"ח, 14 במאי 1948.", true),
                 new AmericanQuestionAnswer("1967", "בשנה זו פרצה מלחמת ששת הימים.", false)
             ]
         ),
@@ -58,68 +60,66 @@ const getTestQuestions = (testSettings: TestSettings) => {
 }
 
 const OrderingQuestionComponent = ({ question, onAnswer, isAnswered }: { question: OrderingQuestion, onAnswer: (answer: OrderingQuestionAnswer) => void, isAnswered: boolean }) => {
-    const [selectedStatements, setSelectedStatements] = React.useState<(OrderingQuestionStatement | null)[]>(new Array(question.statements.length).fill(null));
-    const [menusOpen, setMenusOpen] = React.useState<boolean[]>(new Array(question.statements.length).fill(false));
+    const [statements, setStatements] = React.useState<OrderingQuestionStatement[]>([]);
 
-    const openMenu = (index: number) => setMenusOpen(prev => prev.map((isOpen, i) => i === index ? true : isOpen));
-    const closeMenu = (index: number) => setMenusOpen(prev => prev.map((isOpen, i) => i === index ? false : isOpen));
-
-    const handleSelectStatement = (statement: OrderingQuestionStatement, index: number) => {
-        setSelectedStatements(prev => {
-            const newStatements = [...prev];
-            newStatements[index] = statement;
-            return newStatements;
-        });
-        closeMenu(index);
-    };
+    React.useEffect(() => {
+        // Initialize or reset statements when the question prop changes
+        // Create a shallow copy to ensure immutability and avoid direct prop mutation
+        setStatements([...question.statements]);
+    }, [question]);
 
     const handleLockAnswer = () => {
-        if (selectedStatements.every(s => s !== null)) {
-            onAnswer(new OrderingQuestionAnswer(selectedStatements as OrderingQuestionStatement[]));
-        }
+        onAnswer(new OrderingQuestionAnswer(statements));
     };
 
-    const isStatementSelected = (statement: OrderingQuestionStatement) => {
-        return selectedStatements.some(s => s?.statement === statement.statement);
-    }
-
     return (
-        <View>
-            {selectedStatements.map((selectedStatement, index) => (
-                <Menu
-                    key={index}
-                    visible={menusOpen[index]}
-                    onDismiss={() => closeMenu(index)}
-                    anchor={
+        <GestureHandlerRootView style={{ flex: 1 }}>
+            <DraggableFlatList
+                data={statements}
+                onDragEnd={({ data }) => setStatements(data)}
+                keyExtractor={(item) => item.statement}
+                renderItem={({ item, drag, isActive, getIndex }) => (
+                    <ScaleDecorator>
                         <TouchableOpacity
-                            style={[styles.answerButton, isAnswered ? (selectedStatement?.correctIndex === index ? styles.correctAnswer : styles.incorrectAnswer) : styles.answerButton]}
-                            onPress={() => !isAnswered && openMenu(index)}
-                            disabled={isAnswered}
-                        >
-                            <ThemedText style={styles.answerText}>{selectedStatement ? selectedStatement.statement : `בחר אירוע ${index + 1}`}</ThemedText>
+                            onLongPress={drag}
+                            disabled={isActive || isAnswered}
+                            style={[
+                                styles.answerButton,
+                                isActive && styles.selectedAnswer,
+                                isAnswered && (item.correctIndex === getIndex() ? styles.correctAnswer : styles.incorrectAnswer)
+                            ]}>
+                            <ThemedText style={styles.answerText}>{item.statement}</ThemedText>
                         </TouchableOpacity>
-                    }>
-                    {question.statements.map(statement => (
-                        <Menu.Item
-                            key={statement.statement}
-                            onPress={() => handleSelectStatement(statement, index)}
-                            title={statement.statement}
-                            disabled={isStatementSelected(statement)}
-                        />
-                    ))}
-                </Menu>
-            ))}
+                    </ScaleDecorator>
+                )}
+            />
             {!isAnswered && (
                 <View style={styles.nextButtonContainer}>
-                    <Button style={styles.nextButton} onPress={handleLockAnswer} disabled={selectedStatements.some(s => s === null)}>
+                    <Button style={styles.nextButton} onPress={handleLockAnswer}>
                         <ThemedText style={styles.nextButtonText}>נעל תשובה</ThemedText>
                     </Button>
                 </View>
             )}
-        </View>
+        </GestureHandlerRootView>
     );
 };
 
+const OrderingQuestionResultComponent = ({ userAnswer, question }: { userAnswer: OrderingQuestionAnswer, question: OrderingQuestion }) => {
+    return (
+        <View>
+            {userAnswer.order.map((statement, index) => (
+                <View
+                    key={statement.statement}
+                    style={[
+                        styles.answerButton,
+                        statement.correctIndex === index ? styles.correctAnswer : styles.incorrectAnswer
+                    ]}>
+                    <ThemedText style={styles.answerText}>{statement.statement}</ThemedText>
+                </View>
+            ))}
+        </View>
+    );
+};
 
 export default function TestPage() {
     const testSettings = useTestSettingsStore((state) => state.testSettings);
@@ -243,13 +243,13 @@ export default function TestPage() {
                                     {question instanceof OrderingQuestion && (
                                         <View>
                                             <ThemedText style={styles.detailText}>התשובה שלך:</ThemedText>
-                                            {(userAnswers[index] as OrderingQuestionAnswer)?.order.map((statement, statementIndex) => (
+                                            {(userAnswers[index] as OrderingQuestionAnswer)?.order?.map((statement, statementIndex) => (
                                                 <View key={statementIndex} style={[styles.answerButton, styles.summaryAnswer, statement.correctIndex === statementIndex ? styles.correctAnswer : styles.incorrectAnswer]}>
                                                     <ThemedText style={styles.answerText}>{`${statementIndex + 1}. ${statement.statement}`}</ThemedText>
                                                 </View>
                                             ))}
                                             <ThemedText style={styles.detailText}>התשובה הנכונה:</ThemedText>
-                                            {question.statements.sort((a, b) => a.correctIndex - b.correctIndex).map((statement, statementIndex) => (
+                                            {[...question.statements].sort((a, b) => a.correctIndex - b.correctIndex).map((statement, statementIndex) => (
                                                 <View key={statementIndex} style={[styles.answerButton, styles.summaryAnswer, styles.correctAnswer]}>
                                                     <ThemedText style={styles.answerText}>{`${statementIndex + 1}. ${statement.statement}`}</ThemedText>
                                                      <ThemedText style={styles.detailText}>{statement.description}</ThemedText>
@@ -276,53 +276,71 @@ export default function TestPage() {
     const showAnswerDetails = isAnswered && testSettings.displayAnswer === "AFTER_EACH";
     const selectedAnswer = userAnswers[currentQuestionIndex];
 
+    const TestContent = () => (
+        <>
+            <TouchableOpacity onPress={handleSafeBack} style={styles.backButton}>
+                <ThemedText style={styles.backButtonText}>→ חזור</ThemedText>
+            </TouchableOpacity>
+            <View style={styles.header}>
+                <ThemedText style={styles.questionCounter}>{`שאלה ${currentQuestionIndex + 1}/${questions.length}`}</ThemedText>
+                <ThemedText style={styles.questionText}>{currentQuestion.question}</ThemedText>
+            </View>
+
+            <View style={styles.answersContainer}>
+                {currentQuestion instanceof AmericanQuestion && currentQuestion.answers.map((answer) => (
+                    <TouchableOpacity
+                        key={answer.answer}
+                        style={[styles.answerButton, getAnswerStyle(answer)]}
+                        onPress={() => handleAnswerPress(answer)}
+                        disabled={isAnswered}
+                    >
+                        <ThemedText style={styles.answerText}>{answer.answer}</ThemedText>
+                        {showAnswerDetails && (
+                            <ThemedText style={styles.detailText}>
+                                {answer.description}
+                            </ThemedText>
+                        )}
+                    </TouchableOpacity>
+                ))}
+                {currentQuestion instanceof OrderingQuestion && !isAnswered && (
+                    <OrderingQuestionComponent
+                        question={currentQuestion}
+                        key={currentQuestion.question}
+                        onAnswer={handleAnswerPress}
+                        isAnswered={false}
+                    />
+                )}
+                {currentQuestion instanceof OrderingQuestion && isAnswered && selectedAnswer instanceof OrderingQuestionAnswer && (
+                    <OrderingQuestionResultComponent
+                        userAnswer={selectedAnswer}
+                        question={currentQuestion}
+                    />
+                )}
+            </View>
+
+            <View style={styles.nextButtonContainer}>
+                {(isAnswered || (testSettings.displayAnswer !== "AFTER_EACH" && selectedAnswer)) && (
+                    <Button style={styles.nextButton} onPress={handleNextQuestion}>
+                        <ThemedText style={styles.nextButtonText}>
+                            {currentQuestionIndex === questions.length - 1 ? 'סיים מבחן' : 'לשאלה הבאה'}
+                        </ThemedText>
+                    </Button>
+                )}
+            </View>
+        </>
+    )
+
     return (
         <ThemedView style={styles.container}>
             <StatusBar style="dark" />
-            <ScrollView contentContainerStyle={styles.scrollContainer}>
-                <TouchableOpacity onPress={handleSafeBack} style={styles.backButton}>
-                    <ThemedText style={styles.backButtonText}>→ חזור</ThemedText>
-                </TouchableOpacity>
-                <View style={styles.header}>
-                    <ThemedText style={styles.questionCounter}>{`שאלה ${currentQuestionIndex + 1}/${questions.length}`}</ThemedText>
-                    <ThemedText style={styles.questionText}>{currentQuestion.question}</ThemedText>
+            {currentQuestion instanceof OrderingQuestion ?
+                <View style={styles.scrollContainer}>
+                    <TestContent />
                 </View>
-
-                <View style={styles.answersContainer}>
-                    {currentQuestion instanceof AmericanQuestion && currentQuestion.answers.map((answer) => (
-                        <TouchableOpacity
-                            key={answer.answer}
-                            style={[styles.answerButton, getAnswerStyle(answer)]}
-                            onPress={() => handleAnswerPress(answer)}
-                            disabled={isAnswered}
-                        >
-                            <ThemedText style={styles.answerText}>{answer.answer}</ThemedText>
-                            {showAnswerDetails && (
-                                <ThemedText style={styles.detailText}>
-                                    {answer.description}
-                                </ThemedText>
-                            )}
-                        </TouchableOpacity>
-                    ))}
-                    {currentQuestion instanceof OrderingQuestion && (
-                        <OrderingQuestionComponent
-                            question={currentQuestion}
-                            onAnswer={handleAnswerPress}
-                            isAnswered={isAnswered}
-                        />
-                    )}
-                </View>
-
-                {(isAnswered || (testSettings.displayAnswer !== "AFTER_EACH" && selectedAnswer)) && (
-                    <View style={styles.nextButtonContainer}>
-                        <Button style={styles.nextButton} onPress={handleNextQuestion}>
-                            <ThemedText style={styles.nextButtonText}>
-                                {currentQuestionIndex === questions.length - 1 ? 'סיים מבחן' : 'לשאלה הבאה'}
-                            </ThemedText>
-                        </Button>
-                    </View>
-                )}
-            </ScrollView>
+                :
+                <ScrollView contentContainerStyle={styles.scrollContainer}>
+                    <TestContent />
+                </ScrollView>}
         </ThemedView>
     )
 }
@@ -335,7 +353,7 @@ const styles = StyleSheet.create({
     header: { alignItems: 'center', marginVertical: '10%', paddingTop: '10%' },
     questionCounter: { fontSize: 20, color: 'gray', marginBottom: 10 },
     questionText: { fontSize: 28, fontWeight: 'bold', textAlign: 'center', color: '#333', lineHeight: 32 },
-    answersContainer: { marginVertical: 20 },
+    answersContainer: { marginVertical: 20, flex: 1 },
     answerButton: {
         backgroundColor: 'white',
         padding: 20,
@@ -364,11 +382,15 @@ const styles = StyleSheet.create({
         padding: 15,
         borderRadius: 10,
         backgroundColor: '#e7e7e7',
-        alignAlignItems: 'center',
+        alignItems: 'center',
     },
     toggleAnswersButtonText: {
         fontSize: 16,
         fontWeight: 'bold',
         color: '#333',
-    }
+    },
+    orderingMenuItem: {
+        backgroundColor: 'white',
+        width: width * 0.8,
+    },
 });
