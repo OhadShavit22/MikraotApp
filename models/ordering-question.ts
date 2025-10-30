@@ -2,11 +2,11 @@ import OrderingQuestionStatement from "./ordering-question-statement";
 
 export default class OrderingQuestion {
     question: string;
-    correctOrder: OrderingQuestionStatement[];
+    statements: OrderingQuestionStatement[];
 
-    constructor(question: string, correctOrder: OrderingQuestionStatement[]) {
+    constructor(question: string, statements: OrderingQuestionStatement[]) {
     this.question = question;
-    this.correctOrder = correctOrder;
+    this.statements = statements;
   }
 
 } 
