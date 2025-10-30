@@ -40,8 +40,14 @@ export const getTestQuestions = (testSettings: TestSettings) => {
                 new OrderingQuestionStatement("מלחמת ששת הימים", "מלחמת ששת הימים פרצה ב1967", 2),
                 new OrderingQuestionStatement("מבצע קדש", "מבצע קדש פרץ ב1956", 1),
                 new OrderingQuestionStatement("מלחמת העצמאות", "מלחמת העצמאות פרצה ב1948", 0),
-                new OrderingQuestionStatement("מלחמת יום כיפור", "מלחמת יום כיפור פרצה ב1973", 3)
+                new OrderingQuestionStatement("מלחמת יום כיפור", "מלחמת יום כיפור פרצה ב1973", 3),
+                new OrderingQuestionStatement("מלחמת שלום הגליל", "פרצה ב1982", 4),
+                new OrderingQuestionStatement("מבצע עופרת יצוקה", "פרץ ב2002", 5),
+                new OrderingQuestionStatement("מלחמת לבנון השנייה", "פרצה ב2006", 6),
+                new OrderingQuestionStatement("מבצע צוק איתן", "פרץ ב2014", 7)
             ]
         )
     ]
 }
+
+export default getTestQuestions;
