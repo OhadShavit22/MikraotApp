@@ -53,5 +53,3 @@ export const styles = StyleSheet.create({
         width: width * 0.8,
     },
 });
-
-export default styles;

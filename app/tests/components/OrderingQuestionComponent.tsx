@@ -20,7 +20,6 @@ const OrderingQuestionComponent = ({ question, onAnswer, isAnswered, hasBeenAnsw
 
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
-            <ThemedText style={styles.questionDescription}>כדי להזיז את המשפטים, לחצו לחיצה ארוכה</ThemedText>
             <DraggableFlatList
                 data={statements}
                 onDragEnd={({ data }) => setStatements(data)}
@@ -40,14 +39,17 @@ const OrderingQuestionComponent = ({ question, onAnswer, isAnswered, hasBeenAnsw
                         </TouchableOpacity>
                     </ScaleDecorator>
                 )}
+                ListHeaderComponent={<ThemedText style={styles.questionDescription}>כדי להזיז את המשפטים, לחצו לחיצה ארוכה</ThemedText>}
+                ListFooterComponent={
+                    !isAnswered && !hasBeenAnswered ? (
+                        <View style={styles.nextButtonContainer}>
+                            <Button style={styles.nextButton} onPress={handleLockAnswer}>
+                                <ThemedText style={styles.nextButtonText}>נעל תשובה</ThemedText>
+                            </Button>
+                        </View>
+                    ) : null
+                }
             />
-            {!isAnswered && !hasBeenAnswered && (
-                <View style={styles.nextButtonContainer}>
-                    <Button style={styles.nextButton} onPress={handleLockAnswer}>
-                        <ThemedText style={styles.nextButtonText}>נעל תשובה</ThemedText>
-                    </Button>
-                </View>
-            )}
         </GestureHandlerRootView>
     );
 };
