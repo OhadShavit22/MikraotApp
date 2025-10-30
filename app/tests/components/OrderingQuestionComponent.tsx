@@ -20,6 +20,7 @@ const OrderingQuestionComponent = ({ question, onAnswer, isAnswered, hasBeenAnsw
 
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
+            <ThemedText style={styles.questionDescription}>כדי להזיז את המשפטים, לחצו לחיצה ארוכה</ThemedText>
             <DraggableFlatList
                 data={statements}
                 onDragEnd={({ data }) => setStatements(data)}

@@ -10,6 +10,7 @@ export const styles = StyleSheet.create({
     header: { alignItems: 'center', marginVertical: '10%', paddingTop: '10%' },
     questionCounter: { fontSize: 20, color: 'gray', marginBottom: 10 },
     questionText: { fontSize: 28, fontWeight: 'bold', textAlign: 'center', color: '#333', lineHeight: 32 },
+    questionDescription: { fontSize: 16, textAlign: 'center'}, 
     answersContainer: { marginVertical: 20, flex: 1 },
     answerButton: {
         backgroundColor: 'white',
