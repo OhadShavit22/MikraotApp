@@ -21,7 +21,7 @@ import { useState } from 'react';
     {
       label: 'סיכומים',
       icon: require('@/assets/images/LearnIcon.png'),
-      href: 'landing', // Placeholder
+      href: '/summaries',
     },
     {
       label: 'דרגות',
