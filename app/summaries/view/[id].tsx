@@ -82,12 +82,12 @@ const markdownStyles = StyleSheet.create({
         textAlign: 'right',
         marginBottom: 10,
         marginTop: 10,
+        lineHeight: 30,
         direction: 'rtl',
         width: '100%',
         paddingHorizontal: 5,
     },
     heading3: {
-        fontFamily: 'GevertLevin-Regular',
         fontSize: 22,
         fontWeight: 'bold',
         textAlign: 'right',
@@ -96,6 +96,7 @@ const markdownStyles = StyleSheet.create({
         direction: 'rtl',
         width: '100%',
         paddingHorizontal: 5,
+        lineHeight: 30,
     },
     body: {
         fontSize: 18,

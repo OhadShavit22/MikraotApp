@@ -40,6 +40,109 @@ const TOPICS_METADATA = [
       },
     ],
   },
+  {
+    id: 'PSIFAS',
+    name: 'הפסיפס הישראלי',
+    chapters: [
+      {
+        id: '2.2',
+        name: 'עולם האמונה היהודי: מושגים בסיסיים',
+        asset: require('../../assets/summaries/psifas/psifas-2.2.md'),
+      },
+      {
+        id: '2.3',
+        name: 'מיעוטים במדינת ישראל',
+        asset: require('../../assets/summaries/psifas/psifas-2.3.md'),
+      },
+      {
+        id: '2.4',
+        name: 'לוח השנה הישראלי-יהודי: חגים ומועדים',
+        asset: require('../../assets/summaries/psifas/psifas-2.4.md'),
+      },
+    ],
+  },
+  {
+    id: 'TOLDOT',
+    name: 'תולדות עם ישראל',
+    chapters: [
+      {
+        id: '3.1',
+        name: 'תקופת התנ"ך - ראשיתו של העם היהודי',
+        asset: require('../../assets/summaries/toldot/toldot-3.1.md'),
+      },
+      {
+        id: '3.2',
+        name: 'בית ראשון',
+        asset: require('../../assets/summaries/toldot/toldot-3.2.md'),
+      },
+      {
+        id: '3.3',
+        name: 'בית שני',
+        asset: require('../../assets/summaries/toldot/toldot-3.3.md'),
+      },
+      {
+        id: '3.4',
+        name: 'המרכזים היהודיים',
+        asset: require('../../assets/summaries/toldot/toldot-3.4.md'),
+      },
+      {
+        id: '3.6',
+        name: 'אמנציפציה ורעיון הציונות',
+        asset: require('../../assets/summaries/toldot/toldot-3.6.md'),
+      },
+      {
+        id: '3.7',
+        name: 'התנועה הציונית',
+        asset: require('../../assets/summaries/toldot/toldot-3.7.md'),
+      },
+      {
+        id: '3.8',
+        name: 'תפוצות ישראל',
+        asset: require('../../assets/summaries/toldot/toldot-3.8.md'),
+      },
+    ],
+  },
+  {
+    id: 'HOLOCAST',
+    name: 'בימי השואה',
+    chapters: [
+      {
+        id: '4.1',
+        name: 'שנאת היהודים: פתיחה',
+        asset: require('../../assets/summaries/holocast/holocast-4.1.md'),
+      },
+      {
+        id: '4.2',
+        name: 'עליית המשטר הנאצי',
+        asset: require('../../assets/summaries/holocast/holocast-4.2.md'),
+      },
+      {
+        id: '4.3',
+        name: 'פריצת המלחמה',
+        asset: require('../../assets/summaries/holocast/holocast-4.3.md'),
+      },
+      {
+        id: '4.4',
+        name: 'הפתרון הסופי',
+        asset: require('../../assets/summaries/holocast/holocast-4.4.md'),
+      },
+      {
+        id: '4.5',
+        name: 'הצלה והתנגדות',
+        asset: require('../../assets/summaries/holocast/holocast-4.5.md'),
+      },
+      {
+        id: '4.6',
+        name: 'סיום המלחמה',
+        asset: require('../../assets/summaries/holocast/holocast-4.6.md'),
+      },
+      {
+        id: '4.7',
+        name: 'השואה ומדינת ישראל',
+        asset: require('../../assets/summaries/holocast/holocast-4.7.md'),
+      },
+    ],
+  },
 ];
 
 let cachedTopics: Topic[] | null = null;
