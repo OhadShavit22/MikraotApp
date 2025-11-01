@@ -2,16 +2,30 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Colors } from '@/constants/theme';
 import { router, useLocalSearchParams } from 'expo-router';
-import { ScrollView, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import Markdown from 'react-native-markdown-display';
-import { TOPICS } from '../data';
+import { Chapter, getTopics } from '../data';
 
 export default function ChapterPage() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [topicId, chapterId] = id ? id.split('-') : [null, null];
   
-  const topic = TOPICS.find((t) => t.id === topicId);
-  const chapter = topic?.chapters.find((c) => c.id === chapterId);
+  const [chapter, setChapter] = useState<Chapter | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (topicId && chapterId) {
+      getTopics().then((topics) => {
+        const topic = topics.find((t) => t.id === topicId);
+        const foundChapter = topic?.chapters.find((c) => c.id === chapterId);
+        setChapter(foundChapter || null);
+        setLoading(false);
+      });
+    } else {
+      setLoading(false);
+    }
+  }, [id]);
 
   const handleSafeBack = () => {
     if (router.canGoBack()) {
@@ -20,6 +34,14 @@ export default function ChapterPage() {
         router.replace('/landing');
     }
   };
+
+  if (loading) {
+    return (
+      <ThemedView style={[styles.container, { justifyContent: 'center' }]}>
+        <ActivityIndicator size="large" color={Colors.light.text} />
+      </ThemedView>
+    );
+  }
 
   if (!chapter) {
     return (

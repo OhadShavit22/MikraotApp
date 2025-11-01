@@ -1,3 +1,5 @@
+import { Asset } from 'expo-asset';
+
 export interface Chapter {
   id: string;
   name: string;
@@ -10,7 +12,8 @@ export interface Topic {
   chapters: Chapter[];
 }
 
-export const TOPICS: Topic[] = [
+// This structure will hold the metadata and asset references
+const TOPICS_METADATA = [
   {
     id: 'ID',
     name: 'ישראל: תעודת זהות',
@@ -18,59 +21,56 @@ export const TOPICS: Topic[] = [
       {
         id: '1.1',
         name: 'מדינת ישראל כמדינה יהודית ודמוקרטית',
-        content: `פרק הפתיחה דן בהגדרתה של מדינת ישראל כ"יהודית ודמוקרטית", כפי שנוסח במגילת העצמאות.
-
-הגדרה זו הופיעה לראשונה באופן מפורש בחוקי יסוד בשנת 1992, מה שהצית דיון ציבורי נרחב.
-
-- **פרשנויות מרכזיות:**
-  - **השופט חיים כהן:** ראה ב"יהודית" ו"דמוקרטית" מושג אחד משולב.
-  - **השופט מנחם אלון:** ראה בהן שתי מערכות ערכים מקבילות ושוות מעמד.
-  - **השופט אהרון ברק:** הציע פירוש מצמצם ל"יהדות" (רוב יהודי, לוח שנה) תוך שאיבת ערכים אוניברסליים (כמו קדושת החיים) ממקורות יהודיים.
-`,
+        asset: require('../../assets/summaries/israel/israel-1.1.md'),
       },
       {
         id: '1.2',
         name: 'יסודות המשטר הדמוקרטי',
-        content: ``,
+        asset: require('../../assets/summaries/israel/israel-1.2.md'),
       },
       {
         id: '1.3',
         name: 'צה"ל צבא במדינה יהודית ודמוקרטית',
-        content: `- צה"ל מוגדר כ**צבא עם**.
-- **עקרון המרות:** צה"ל כפוף לדרג המדיני (הממשלה והכנסת) ומהווה זרוע מבצעת של החלטותיה.
-- **א-פוליטיות:** על חיילי צה"ל נאסר להביע דעות פוליטיות בציבור, להשתתף בהפגנות או לחתום על עצומות פוליטיות.
-- **צביון יהודי:** בא לידי ביטיו בשמירת כשרות בכל מטבחי צה"ל, נוהל שבת (לפעילות לא מבצעית) ופעילות הרבנות הצבאית.
-- **פקודה בלתי חוקית בעליל:** חיילים נדרשים לציית לפקודות חוקיות. עם זאת, מוטלת על החייל **חובה לסרב** לפקודה "בלתי חוקית בעליל".
-  - מושג זה נטבע ביחס לפקודה שניתנה במהלך **טבח כפר קאסם**.
-`,
+        asset: require('../../assets/summaries/israel/israel-1.3.md'),
       },
       {
         id: '1.4',
         name: 'סמלים לאומיים',
-        content: `הסמלים הלאומיים של ישראל מזוהים עם המורשת ההיסטורית של היהדות.
-
-### סמל המדינה
-
-- הסמל עוצב על ידי האחים גבריאל ומקסים שמיר.
-- **מרכיבים:**
-  - **המנורה (בת שבעה קנים):** מייצגת את עבר העם. צורתה מבוססת על התבליט המופיע ב**שער טיטוס** ברומא.
-  - **ענפי זית:** מסמלים את השאיפה לשלום.
-
-### דגל המדינה
-
-- עיצובו מבוסס על **הטלית** (צעיף התפילה היהודי).
-- העיצוב הוצע על ידי דוד וולפסון לקראת **הקונגרס הציוני הראשון**.
-- **1933:** אומץ רשמית כדגל ההסתדרות הציונית ב**קונגרס הציוני ה-18**.
-- **28 באוקטובר 1948:** נבחר רשמית כדגלה של מדינת ישראל.
-
-### המנון המדינה
-
-- ההמנון נקרא **"התקווה"**.
-- נכתב על ידי המשורר נפתלי הרץ אימבר.
-- **1933:** נקבע כהמנון הרשמי של התנועה הציונית ב**קונגרס הציוני ה-18**.
-- **2004:** מעמדו עוגן בחוק המדינה.
-`,
+        asset: require('../../assets/summaries/israel/israel-1.4.md'),
       },
     ],
   },
 ];
+
+let cachedTopics: Topic[] | null = null;
+
+export async function getTopics(): Promise<Topic[]> {
+  if (cachedTopics) {
+    return cachedTopics;
+  }
+
+  const topics: Topic[] = [];
+
+  for (const topicData of TOPICS_METADATA) {
+    const chapters: Chapter[] = [];
+    for (const chapterData of topicData.chapters) {
+      const asset = Asset.fromModule(chapterData.asset);
+      // No need to download explicitly, fetch can handle it.
+      const response = await fetch(asset.uri);
+      const content = await response.text();
+      chapters.push({
+        id: chapterData.id,
+        name: chapterData.name,
+        content: content,
+      });
+    }
+    topics.push({
+      id: topicData.id,
+      name: topicData.name,
+      chapters: chapters,
+    });
+  }
+
+  cachedTopics = topics;
+  return topics;
+}

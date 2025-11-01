@@ -2,10 +2,21 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Colors } from '@/constants/theme';
 import { Link, router } from 'expo-router';
-import { FlatList, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { TOPICS } from './data';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { getTopics, Topic } from './data';
 
 export default function SummariesIndex() {
+  const [topics, setTopics] = useState<Topic[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getTopics().then((loadedTopics) => {
+      setTopics(loadedTopics);
+      setLoading(false);
+    });
+  }, []);
+
   const handleSafeBack = () => {
     if (router.canGoBack()) {
         router.back();
@@ -14,6 +25,14 @@ export default function SummariesIndex() {
     }
   };
 
+  if (loading) {
+    return (
+      <ThemedView style={[styles.container, { justifyContent: 'center' }]}>
+        <ActivityIndicator size="large" color={Colors.light.text} />
+      </ThemedView>
+    );
+  }
+
   return (
     <ThemedView style={styles.container}>
       <TouchableOpacity onPress={handleSafeBack} style={styles.backButton}>
@@ -21,7 +40,7 @@ export default function SummariesIndex() {
       </TouchableOpacity>
       <ThemedText style={styles.title}>פרקים</ThemedText>
       <FlatList
-        data={TOPICS}
+        data={topics}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <Link href={`/summaries/${item.id}`} asChild>

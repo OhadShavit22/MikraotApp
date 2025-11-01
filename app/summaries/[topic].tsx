@@ -2,12 +2,22 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Colors } from '@/constants/theme';
 import { Link, router, useLocalSearchParams } from 'expo-router';
-import { FlatList, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { TOPICS } from './data';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { getTopics, Topic } from './data';
 
 export default function TopicPage() {
   const { topic: topicId } = useLocalSearchParams<{ topic: string }>();
-  const topic = TOPICS.find((t) => t.id === topicId);
+  const [topic, setTopic] = useState<Topic | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getTopics().then((topics) => {
+      const foundTopic = topics.find((t) => t.id === topicId);
+      setTopic(foundTopic || null);
+      setLoading(false);
+    });
+  }, [topicId]);
 
   const handleSafeBack = () => {
     if (router.canGoBack()) {
@@ -16,6 +26,14 @@ export default function TopicPage() {
         router.replace('/landing');
     }
   };
+
+  if (loading) {
+    return (
+      <ThemedView style={[styles.container, { justifyContent: 'center' }]}>
+        <ActivityIndicator size="large" color={Colors.light.text} />
+      </ThemedView>
+    );
+  }
 
   if (!topic) {
     return (
