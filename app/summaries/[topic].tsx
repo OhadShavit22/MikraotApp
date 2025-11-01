@@ -1,11 +1,14 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Colors } from '@/constants/theme';
-import { Link, router } from 'expo-router';
+import { Link, router, useLocalSearchParams } from 'expo-router';
 import { FlatList, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { TOPICS } from './data';
 
-export default function SummariesIndex() {
+export default function TopicPage() {
+  const { topic: topicId } = useLocalSearchParams<{ topic: string }>();
+  const topic = TOPICS.find((t) => t.id === topicId);
+
   const handleSafeBack = () => {
     if (router.canGoBack()) {
         router.back();
@@ -14,17 +17,25 @@ export default function SummariesIndex() {
     }
   };
 
+  if (!topic) {
+    return (
+      <ThemedView style={styles.container}>
+        <Text>Topic not found.</Text>
+      </ThemedView>
+    );
+  }
+
   return (
     <ThemedView style={styles.container}>
       <TouchableOpacity onPress={handleSafeBack} style={styles.backButton}>
           <ThemedText style={styles.backButtonText}>→ חזור</ThemedText>
       </TouchableOpacity>
-      <ThemedText style={styles.title}>פרקים</ThemedText>
+      <ThemedText style={styles.title}>{topic.name}</ThemedText>
       <FlatList
-        data={TOPICS}
+        data={topic.chapters}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <Link href={`/summaries/${item.id}`} asChild>
+          <Link href={`/summaries/view/${topic.id}-${item.id}`} asChild>
             <TouchableOpacity style={styles.item}>
               <Text style={styles.itemText}>{item.name}</Text>
             </TouchableOpacity>
@@ -40,7 +51,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
-  title: {
+    title: {
     textAlign: 'center',
     fontSize: 30,
     fontWeight: 'bold',
@@ -48,7 +59,6 @@ const styles = StyleSheet.create({
     fontFamily: 'GevertLevin-Regular',
     lineHeight: 30,
     paddingVertical: '20%'
-    
   },
   item: {
     padding: 15,
